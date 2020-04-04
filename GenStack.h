@@ -1,69 +1,3 @@
-// // #include <iostream>
-// // #include <unistd.h>
-// // #include <fstream>
-// // using namespace std;
-// //
-// // class GenStack{
-// // public:
-// //   GenStack();//deffault constructor
-// //   GenStack(int maxSize); //overloaded constructor
-// //   ~GenStack(); //destructor
-// //
-// //   //functions
-// //   void push(char data);//insert
-// //   char pop();//delete
-// //
-// //   //helper functions
-// //   bool isFull();
-// //   bool isEmpty();
-// //   char peek();
-// //
-// //   int m_size;//max size of myStack
-// //   int top; //variable to keep track of indices representing the top of our stack
-// //
-// //
-// //   char *myArray; //pointer to declare at runtime
-// //
-// //
-// //
-// //
-// // };
-//
-//
-//
-// #include <iostream>
-// #include <unistd.h>
-// #include <fstream>
-// using namespace std;
-//
-// template<typename T>
-// class GenStack{
-// public:
-//   GenStack();//deffault constructor
-//   GenStack(int maxSize); //overloaded constructor
-//   ~GenStack(); //destructor
-//
-//   //functions
-//   void push(T data);//insert
-//   T pop();//delete
-//
-//   //helper functions
-//   bool isFull();
-//   bool isEmpty();
-//   T peek();
-//
-//   int m_size;//max size of myStack
-//   int top; //variable to keep track of indices representing the top of our stack
-//
-//
-//   T *myArray; //pointer to declare at runtime
-//
-//
-//
-//
-// };
-
-
 #include <iostream>
 #include <unistd.h>
 #include <fstream>
@@ -71,38 +5,27 @@ using namespace std;
 
 template<class T>
 class GenStack{
-  // int m_size;//max size of myStack
-  // int top; //variable to keep track of indices representing the top of our stack
-  // T *myArray; //pointer to declare at runtime
-
 
 public:
   GenStack();//deffault constructor
   GenStack(int maxSize); //overloaded constructor
   ~GenStack(); //destructor
-
   //functions
   void push(T data);//insert
   T pop();//delete
-
   //helper functions
   bool isFull();
   bool isEmpty();
   T peek();
   void checkDelimiters(string fileName);
-
-
-
   int m_size;//max size of myStack
   int top; //variable to keep track of indices representing the top of our stack
-
-
   T *myArray; //pointer to declare at runtime
 
 };
 
 
-template <class T>
+template <class T> //deffault
 GenStack<T>::GenStack(){
   myArray = new T[128];
   m_size = 128;
@@ -119,18 +42,23 @@ GenStack<T>::GenStack(int maxSize){
 
 }
 
-
-
 template<class T>
 void GenStack<T>::push(T data){
   //check if full before inserting
-
+  if(isFull()==true){ //if full create new
+    T* tempArray= new T[++m_size];
+    tempArray = myArray;
+    myArray = new T[++m_size];
+    for(int i = 0;i<(m_size-1);++i){
+      myArray[i]=tempArray[i];
+    }
+    delete tempArray;
+  }
   myArray[++top] = data;
 }
 
 template<class T>
 T GenStack<T>::pop(){
-  //check if isEmpty before preceding to remove
 
   return myArray[top--];
 }
@@ -143,6 +71,7 @@ T GenStack<T>::peek(){
 
 template<class T>
 bool GenStack<T>::isFull(){
+
   return (top == m_size-1);
 }
 
@@ -156,16 +85,13 @@ GenStack<T>::~GenStack(){
   delete myArray;
 }
 
-
-
-
 template<class T>
-void GenStack<T>::checkDelimiters(string fileName){
+void GenStack<T>::checkDelimiters(string fileName){ //check delimiters
 ifstream inFS;
 int lineCount = 0;
 string content;
 int stackSize = 0;
-GenStack<char> *myStack = new GenStack<char>(512);
+GenStack<char> *myStack = new GenStack<char>(128); //initialize
 
 
 inFS.open(fileName);
@@ -179,15 +105,15 @@ while(!inFS.eof()){
   if(!inFS.fail()){
     lineCount++;
     for(int i = 0;i<content.size();++i){
-      if(content[i]=='{'  || content[i]=='['  ||content[i]=='(' ){
+      if(content[i]=='{'  || content[i]=='['  ||content[i]=='(' ){ //add to stack if open
         myStack-> push(content[i]);
       }
-      else if(content[i]=='}'){
+      else if(content[i]=='}'){ //check if closing delimiter
         //peek and compare
-        if(myStack->peek() =='{' ) {
+        if(myStack->peek() =='{' ) { //if it closes pop it off
           myStack->pop();
 
-        }else{
+        }else{ //tell it what its missing
           cout<<"Expecting delimiter of type '{' on line: "<<lineCount<<endl;
           }
       }
@@ -210,12 +136,10 @@ while(!inFS.eof()){
   }
 }
 }
-while(myStack->isEmpty()==false){
+while(myStack->isEmpty()==false){ //tell every delimiter not dealt with
   cout<< "missing delimiter for "<<myStack->peek()<<endl;
   myStack->pop();
 }
-
-
 
 inFS.close();
 delete myStack;

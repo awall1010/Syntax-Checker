@@ -9,7 +9,7 @@ int main(int argc, char const *argv[]) {
 string fName;
 fName = argv[1];
 
-GenStack<char> *checkStack = new GenStack<char>(512);
+GenStack<char> *checkStack = new GenStack<char>(128);
 checkStack->checkDelimiters(fName);
 
 bool anotherFile = true;
